@@ -1,11 +1,11 @@
-# vue-shopping-mall
+# freefish-vue
 基于Vue.js 2.x系列 + vue2-router + axios + iview 商城
 
 ## 安装步骤
 
 ```shell
-git clone https://github.com/hj624608494/vue-shopping-mall.git // 把代码下载到本地
-cd vue-shopping-mall
+git clone https://github.com/xinjiakun/freefish-vue.git // 把代码下载到本地
+cd freefish-vue
 npm install // 安装项目依赖，等待安装完成之后 (cnpm install)
 ```
 
