@@ -11,7 +11,7 @@
           </div>
         </div>
 				<div class="item-box">
-					<shop-item key="index" v-for="item,index in goodsList" :item="item"></shop-item>
+					<shop-item key="index" v-for="item,index in goodsList[0]" :item="item"></shop-item>
 				</div>
 			</div>
       <div class="gray-box">
@@ -22,7 +22,7 @@
           </div>
         </div>
 				<div class="item-box">
-					<shop-item key="index" v-for="item,index in goodsList" :item="item"></shop-item>
+					<shop-item key="index" v-for="item,index in goodsList[1]" :item="item"></shop-item>
 				</div>
 			</div>
       <div class="gray-box">
@@ -33,7 +33,7 @@
           </div>
         </div>
 				<div class="item-box">
-					<shop-item key="index" v-for="item,index in goodsList" :item="item"></shop-item>
+					<shop-item key="index" v-for="item,index in goodsList[2]" :item="item"></shop-item>
 				</div>
 			</div>
   </div>
@@ -47,25 +47,13 @@ import { myPost, myGet } from '@/components/api'
 export default {
   data(){
     return{
-      goodsList: goodData,
+      goodsList:[]
     }
   },
   mounted () {
-      let data = new FormData();
-      data.append('name',1); 
-      
-      myPost('/select',data).then(res=>{
-
+      myPost('api/home').then(res=>{
+        this.goodsList=res.data.result;
       })
-      let params={
-        params:{
-          name:2
-        }
-      }
-      myGet('/select',params).then(res=>{
-
-      })
-    
   },
   components: {
     shopItem,

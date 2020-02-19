@@ -30,11 +30,15 @@
 					<!--active-->
 					<car-panel class="nav-cart"></car-panel>
 				</ul>
+				<el-input placeholder="请输入内容" prefix-icon="el-icon-search" v-model="state1"
+					clearable style="margin-left: 70px; width:200px; float: right; margin: 30px 50px 0 0"
+					@blur="handleSelect()"
+				></el-input>
 				<ul class="nav-list">
 					<router-link to="/" exact tag="li" activeClass="active"><a>首页商城</a></router-link>
 					<router-link to="/shop" exact tag="li" activeClass="active"><a>全部商品</a></router-link>
 					<router-link to="/upload" exact tag="li" activeClass="active"><a>商品发布</a></router-link>
-								<el-autocomplete       
+								<!-- <el-autocomplete       
 					class="inline-input"          
 					v-model="state1"         
 					placeholder="请输入内容"     
@@ -44,8 +48,9 @@
 					style="margin-left: 70px"
 					clearable
 					>   
-				</el-autocomplete>
+				</el-autocomplete> -->
 				</ul>
+
 
 
 			</div>
@@ -89,10 +94,10 @@ export default {
   methods: {
 	  querySearch(queryString, cb) {   
         this.$http({
-            url: "http://localhost:8067/api/home",
+            url: "http://localhost:8067/api/nowSelect",
             method: "post",
             params: {
-                    name:queryString 
+                    select:queryString 
              }
         }).then(({ data }) => {
 			// for(var i=0;i<data.result.length;i++){
@@ -103,25 +108,16 @@ export default {
 			if(data.result==null){
 				cb([{'value':'暂无相关内容'}]);
 			}else{
-
 				cb(data.result);
 			}
       });
 	},
 	handleSelect(item){
 		let data = new FormData();
-		data.append('name',item.value); 
+		data.append('select',this.state1); 
 		
-		myPost('/select',data).then(res=>{
-
-		})
-		let params={
-			params:{
-				name:item.value
-			}
-		}
-		myGet('/select',params).then(res=>{
-
+		myPost('api/select',data).then(res=>{
+			this.$emit('getGoods',res.data);
 		})
 		
 	}

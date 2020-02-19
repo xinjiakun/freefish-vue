@@ -18,6 +18,17 @@
 					<shop-item key="index" v-for="item,index in goodsList" :item="item"></shop-item>
 				</div>
 			</div>
+      <div style="margin:20px auto; width:500px;">
+          <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page.sync="currentPage"
+          :page-sizes="[8,16,24,32]"
+          :page-size="8"
+          layout="sizes, prev, pager, next"
+          :total= this.total>
+        </el-pagination>
+      </div>  
 		</div>
     <prompt v-if="maxCount"></prompt>
 	</div>
@@ -28,15 +39,21 @@
 import goodData from '@/lib/newGoodsData'
 import shopItem from '@/components/shop-item'
 import prompt from '@/components/prompt'
+import { myPost, myGet } from '@/components/api'
 export default {
   data () {
     return {
-      goodsList: goodData,
+      goodsList: [],
+      goodsListPro:[],
+      currentPage:'',
+      pageSize: 8,
+      pageNum:1,
+      total:'',
       sort: [{
         name: '综合排序',
         value: 0
         }, {
-        name: '销量排序',
+        name: '上架时间排序',
         value: 1
         }, {
         name: '价格低到高',
@@ -65,7 +82,7 @@ export default {
           name: '全部',
           value: 0
         },{
-        name: '手机数码',
+        name: '数码电子',
         value: 1
         }, {
         name: '服饰球鞋',
@@ -86,46 +103,73 @@ export default {
         name: '其他',
         value: 7
       }],
-      sortActive: 1,
+      sortActive: 0,
       newActive: 0,
       typeActive: 0,
       input0: null,
       input1: null,
     }
   },
+  props:{
+    goodsList:{
+      type:Array
+    },
+  },
   methods:{
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.pageChange();
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      this.pageNum = val;
+      this.pageChange();
+      console.log(`当前页: ${val}`);
+    },
+    pageChange(){
+      var from = this.pageSize * (this.pageNum - 1);
+      var to = this.pageSize > this.goodsListPro.length-from ? this.goodsListPro.length :this.pageSize+from;
+      console.log("from"+from);
+      console.log("to"+to);
+      this.goodsList = this.goodsListPro.slice(from,to); 
+    },
     sortSelected(value) {
-    this.sortActive = value;
+      this.sortActive = value;
+      this.getGoods();
     },
     newSelected(value) {
-    this.newActive = value;
+      this.newActive = value;
+      this.getGoods();
     },
     typeSelected(value) {
-    this.typeActive = value;
+      this.typeActive = value;
+      this.getGoods();
     },
     lowerPrice(){
       console.log(this.input0); 
+      this.getGoods();
     },
     highPrice(){
       console.log(this.input1); 
+      this.getGoods();
+    },
+    getGoods(){
+      let data = new FormData();
+      data.append('SortEnum',this.sortActive);
+      data.append('oldOrEnum',this.newActive);
+      data.append('subjectEnum',this.typeActive);
+      data.append('lowerPrice',this.input0);
+      data.append('highPrice',this.input1);
+      myPost('api/allGoods',data).then(res=>{
+            this.goodsList = res.data.result;
+            this.goodsListPro = res.data.result;
+            this.total = this.goodsListPro.length;
+            this.pageChange();
+      })
     }
   },
   mounted () {
-      let data = new FormData();
-      data.append('name',1); 
-      
-      myPost('/select',data).then(res=>{
-
-      })
-      let params={
-        params:{
-          name:2
-        }
-      }
-      myGet('/select',params).then(res=>{
-
-      })
-    
+    this.getGoods();
   },
   components: {
     shopItem,
