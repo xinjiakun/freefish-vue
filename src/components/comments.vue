@@ -1,5 +1,5 @@
 <template>
-  <div class="all-reply">
+  <div class="all-reply" style="padding-bottom:100px">
       <div class="title">
       <h2>评论</h2>
       <div>
@@ -31,7 +31,7 @@
         <span class="author-time">{{item.time}}</span>
       </div>
       <div class="icon-btn">
-        <span @click="showReplyInput(i,item.name,item.id)">
+        <span @click="showReplyInput(i,item.id,item.fromUserId)">
           <i class="iconfont el-icon-s-comment"></i>
           {{item.commentNum}}
         </span>
@@ -46,14 +46,14 @@
         </p>
       </div>
       <div class="reply-box" v-show="item.senShow">
-        <div v-for="(reply,j) in item.reply" :key="j" class="author-title">
-          <el-avatar class="header-img" :size="40" :src="reply.fromHeadImg"></el-avatar>
+        <div v-for="(reply,j) in item.commentVOS" :key="j" class="author-title">
+          <el-avatar class="header-img" :size="40" :src="reply.headImg"></el-avatar>
           <div class="author-info">
-            <span class="author-name">{{reply.from}}</span>
+            <span class="author-name">{{reply.name}}</span>
             <span class="author-time">{{reply.time}}</span>
           </div>
           <div class="icon-btn">
-            <span @click="showReplyInput(i,reply.from,reply.id)">
+            <span @click="showReplyInput(i,reply.id,reply.fromUserId)">
               <i class="iconfont el-icon-s-comment"></i>
               {{reply.commentNum}}
             </span>
@@ -62,7 +62,7 @@
           </div>
           <div class="talk-box">
             <p>
-              <span>回复 {{reply.to}}:</span>
+              <span>回复 {{reply.toName}}:</span>
               <span class="reply">{{reply.comment}}</span>
             </p>
           </div>
@@ -93,7 +93,9 @@
     </div>
   </div>
 </template>
+
 <script>
+import { myPost, myGet } from '@/components/api'
 const clickoutside = {
   // 初始化指令
   bind(el, binding, vnode) {
@@ -120,6 +122,14 @@ const clickoutside = {
   }
 };
 export default {
+  props:{
+    comments:{
+      type:Array
+    },
+    goodId:{
+      type:String
+    },
+  },
   name: "ArticleComment",
   data() {
     return {
@@ -128,6 +138,7 @@ export default {
       index: "0",
       replyComment: "",
       myName: "Lana Del Rey",
+      myUserId:"2",
       myHeader:
         "https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg",
       myId: 19870621,
@@ -241,11 +252,11 @@ export default {
       replyInput.style.padding = "10px";
       replyInput.style.border = "none";
     },
-    showReplyInput(i, name, id) {
+    showReplyInput(i, id, fromUserId) {
       this.comments[this.index].inputShow = false;
       this.index = i;
       this.comments[i].inputShow = true;
-      this.to = name;
+      this.to = fromUserId;
       this.toId = id;
     },
     _inputShow(i) {
@@ -270,9 +281,25 @@ export default {
         a.commentNum = 0;
         a.like = 0;
         this.comments.push(a);
+        this.pushCommet(time,0,0);
         this.replyComment = "";
         input.innerHTML = "";
+        
       }
+    },
+    pushCommet(time,id,toUserId){
+      let data = new FormData();
+      data.append('goodId',this.goodId); 
+      data.append('fromUserId',this.myUserId); 
+      data.append('toUserId',toUserId); 
+      data.append('comment',this.replyComment); 
+      data.append('parentId',id); 
+      myPost('/item/comment',data).then(res=>{
+        this.$message({
+          message: '评论成功',
+          type: 'success'
+        })
+      })
     },
     sendCommentReply(i, j) {
       if (!this.replyComment) {
@@ -285,17 +312,19 @@ export default {
         let a = {};
         let timeNow = new Date().getTime();
         let time = this.dateStr(timeNow);
-        a.from = this.myName;
-        a.to = this.to;
-        a.fromHeadImg = this.myHeader;
+        a.name = this.myName;
+        a.toName = this.to;
+        a.headImg = this.myHeader;
         a.comment = this.replyComment;
         a.time = time;
-        a.commentNum = 0;
         a.like = 0;
-        this.comments[i].reply.push(a);
+        this.comments[i].commentVOS.push(a);
+        this.pushCommet(time,this.toId,this.to);
         this.replyComment = "";
         document.getElementsByClassName("reply-comment-input")[i].innerHTML =
           "";
+        
+        
       }
     },
     onDivInput: function(e) {

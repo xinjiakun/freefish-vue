@@ -1,10 +1,10 @@
 <template>
   <div class="item">
     <div>
-      <div class="item-img"><img :alt="item.title" :src="item.ali_image" style="opacity: 1;">
+      <div class="item-img"><img :alt="item.title" :src="item.aliImage" style="opacity: 1;">
       </div>
-      <h6>{{item.title}}</h6>
-      <h3>{{item.sub_title}}</h3>
+      <h6 v-html="item.title"></h6>
+      <h3 v-html="item.subTitle"></h3>
       <!-- <div class="params-colors">
         <ul class="colors-list">
           <li key="index" v-for="sku,index in item.sku_info">
@@ -13,7 +13,7 @@
         </ul>
       </div> -->
       <div class="item-btns clearfix">
-        <span class="item-gray-btn"><router-link :to="{name: 'Item', query: {itemId:item.sku_id}}">查看详情</router-link> </span>
+        <span class="item-gray-btn"><router-link :to="{name: 'Item', query: {itemId:item.id}}">查看详情</router-link> </span>
         <!-- <span @click="addCarPanelHandle(item.sku_info[itemIndex])" class="item-blue-btn">加入购物车 </span> -->
       </div>
       <div class="item-price clearfix">
@@ -21,7 +21,7 @@
       </div>
       <div class="discount-icon">false</div>
       <div class="item-cover">
-        <router-link :to="{name: 'Item', query: {itemId:item.sku_id}}"></router-link>
+        <router-link :to="{name: 'Item', query: {itemId:item.id}}"></router-link>
       </div>
     </div>
   </div>
@@ -95,10 +95,16 @@ export default {
     margin: 0 auto;
     padding: 0 14px;
 }
+.sku-box .item h6 span{
+    color:#b33239;
+}
+.sku-box .item h3 span{
+    color:#b33239;
+}
 .sku-box .item h3{
   line-height: 1.2;
     font-size: 12px;
-    color: #d0d0d0;
+    color: #817d7d;
     margin: 8px auto 14px;
 }
 .sku-box .item .params-colors{

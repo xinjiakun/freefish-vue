@@ -1,12 +1,12 @@
 <template>
 <div id="main">
-	<div class="store-content item" style="height:550px">
+	<div class="store-content item" style="padding-bottom:10px">
 		<div class="item-box">
 			<div class="gallery-wrapper">
 				<div class="gallery">
 					<div class="thumbnail">
 						<ul>
-							<li :class="{'on':imgUrl==img}" key="index" v-for="img,index in itemsInfo.ali_images" @click='imgUrl=img'><img :src="img+'?x-oss-process=image/resize,w_54/quality,Q_90/format,webp'"></li>
+							<li :class="{'on':imgUrl==img}" key="index" v-for="img,index in itemsInfo.imagesDO" @click='imgUrl=img'><img :src="img+'?x-oss-process=image/resize,w_54/quality,Q_90/format,webp'"></li>
 						</ul>
 					</div>
 					<div class="thumb">
@@ -26,14 +26,14 @@
 					</div>
 					<div class="params-info">
 						<h4>{{itemsInfo.title}}</h4>
-						<h6>{{itemsInfo.sub_title}}</h6>
+						<h5>新旧程度: {{itemsInfo.oldOr}}</h5>
 					</div>
 				</div>
 				<div class="sku-dynamic-params-panel">
 					<div class="sku-dynamic-params clear">
                         <div>
-                            <span class="params-name">颜色</span>
-                            <span class="params-name">{{itemsInfo.title}}</span>
+                            <span class="params-name">详情简介</span>
+                            <span class="params-name" style="width:300px; padding:0;">{{itemsInfo.subTitle}}</span>
                         <el-button type="info" icon="el-icon-share" size="small" @click="copy()" round="true" plain style="margin: 10px 10px; float:right"></el-button>
                         </div>       
 					</div>
@@ -57,7 +57,7 @@
                          <comments ref="first"></comments>
       </el-tabs> -->
 
-      <comments title="评论">
+      <comments title="评论" :comments="itemsInfo.commentVOS" :goodId="itemsInfo.id" >
         <div slot="content">
           <div class="img-item">
             <div v-html="productMsg">{{ productMsg }}</div>
@@ -96,45 +96,40 @@ export default {
       count: 1,
       item :"",
       imgUrl: '',
+      itemsInfo:""
     }
   },
   computed: {
-    itemsInfo () {
-      let itemsInfo = this.itemsList.filter((item) => {
-        return item.sku_id == this.$route.query.itemId
-      })[0]
-      return itemsInfo
-    },
+    // itemsInfo () {
+    //   let itemsInfo = this.itemsList.filter((item) => {
+    //     return item.sku_id == this.$route.query.itemId
+    //   })[0]
+    //   return itemsInfo
+    // },
     maxCount () {
       return this.$store.state.maxOff
     }
   },
   mounted () {
       let data = new FormData();
-      data.append('name',this.$route.query.itemId); 
+      data.append('id',this.$route.query.itemId); 
       
-      myPost('/select',data).then(res=>{
-
+      myPost('item/good',data).then(res=>{
+        this.itemsInfo=res.data.result;
+        this.imgUrl = res.data.result.aliImage;
       })
-      let params={
-        params:{
-          name:this.$route.query.itemId
-        }
-      }
-      myGet('/select',params).then(res=>{
-
-      })
-    
   },
   methods: {
     score(){
       console.log(this.iconValue); 
       let data = new FormData();
-      data.append('name',this.iconValue); 
+      data.append('score',this.iconValue); 
       data.append('id',this.$route.query.itemId); 
-
-      myPost('/select',data).then(res=>{
-
+      myPost('/item/score',data).then(res=>{
+        this.$message({
+          message: '评分成功',
+          type: 'success'
+        })
       })
     },
     copy(){

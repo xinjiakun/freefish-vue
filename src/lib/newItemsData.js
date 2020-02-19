@@ -4,6 +4,7 @@ let itemsData = [{
   "sub_title": "TPU 环保材质、耐磨、耐油、耐久性强",
   "ali_image": "http://image.smartisanos.cn/resource/902befd5f32a8caf4ca79b55d39ee25a.jpg",
   "price": 49,
+  "oldOr":"7成",
   "limit_num": 5,
   "spec_json": {
     "image": "attr/v2/1000271/948F029DCF134EF23267994487994DA5/",
@@ -23,6 +24,7 @@ let itemsData = [{
   "sub_title": "TPU 环保材质、耐磨、耐油、耐久性强",
   "ali_image": "http://image.smartisanos.cn/resource/554da94d8e4f84f03e0015fd1c997f46.jpg",
   "price": 49,
+  "oldOr":"7成",
   "limit_num": 5,
   "spec_json": {
     "image": "attr/v2/1000271/649AD35E36A9703BACBE1555AEB6D266/",
@@ -70,6 +72,7 @@ let itemsData = [{
   "sub_title": "10000mAh 双向快充、轻盈便携、高标准安全保护",
   "ali_image": "http://image.smartisanos.cn/resource/ae40a16324658c192c7361d829f603bd.jpg",
   "price": 199,
+  "oldOr":"7成",
   "limit_num": 1,
   "spec_json": {
     "image": "attr/v2/1000299/B37F37544921114CEF1EC01ED4DF44E4/",
