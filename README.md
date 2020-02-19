@@ -39,7 +39,7 @@
 - Vue 2.x
 - Vuex
 - Vue Router
-- [Element UI](http://element.eleme.io/#/zh-CN)
+- [Element UI](https://element.eleme.cn/2.0/#/zh-CN/component/installation)
 - ES6
 - webpack
 - axios
