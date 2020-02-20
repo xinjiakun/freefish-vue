@@ -12,6 +12,9 @@
 						    <router-link :to="{name: 'Account'}" exact tag="li" activeClass="current">
 						        <a>我的订单</a>
 						    </router-link>
+                            <router-link :to="{name: 'Information'}" tag="li" activeClass="current">
+                                <a>个人信息</a>
+                            </router-link>
 							<router-link :to="{name: 'Address'}" tag="li" activeClass="current">
                                 <a>收货地址</a>
                              </router-link>

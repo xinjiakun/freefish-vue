@@ -6,6 +6,8 @@ import '@/assets/css/header.css'
 Vue.use(Router)
 
 import Home from '@/views/home'
+import Login from '@/views/login/Login'
+import Register from '@/views/login/Register'
 import Shop from '@/views/shop'
 import Item from '@/views/item'
 import Cart from '@/views/cart'
@@ -13,6 +15,7 @@ import Checkout from '@/views/checkout'
 import Payment from '@/views/payment'
 import Account from '@/views/account'
 import Order from '@/views/account/order'
+import Information from '@/views/account/information'
 import Address from '@/views/account/address'
 import Upload from '@/views/account/Upload'
 
@@ -27,10 +30,31 @@ export default new Router({
   },
   routes: [
     {
+      //首页
       path: '/',
       name: 'Home',
+      meta: {
+        isLogin: false
+      },
       component: Home
     },
+    {
+      path: '/login',
+      component: Login,
+      children: [
+        {
+          path: '/login',
+          name: 'login',
+          component: Login
+        },
+        {
+          path: '/register',
+          name: 'register',
+          component: Register
+        },
+      ]
+    },
+
     {
       path: '/shop',
       name: 'Shop',
@@ -71,8 +95,16 @@ export default new Router({
           component: Address
         },
         {
+          path: '/information',
+          name: 'Information',
+          component: Information
+        },
+        {
           path: '/upload',
           name: 'Upload',
+          meta: {
+            isLogin: true
+          },
           component: Upload
         }
       ]
