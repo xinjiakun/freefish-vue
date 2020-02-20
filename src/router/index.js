@@ -43,7 +43,7 @@ export default new Router({
       component: Login,
       children: [
         {
-          path: '/login',
+          path: '/',
           name: 'login',
           component: Login
         },
