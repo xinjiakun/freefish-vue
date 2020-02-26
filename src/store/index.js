@@ -3,8 +3,10 @@ import Vuex from 'Vuex'
 
 Vue.use(Vuex)
 
-let store = new Vuex.Store({
+const store = new Vuex.Store({
   state: {
+
+    
     carPanelData: [],
     receiveInfo: [{
       'name': '王某某',
@@ -104,7 +106,11 @@ let store = new Vuex.Store({
       return maxOff
     }
   },
+
   mutations: {
+
+  
+
   	addCarPanelData (state,data) {
   	  let bOff = true
   	  state.carPanelData.forEach((goods) => {

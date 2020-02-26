@@ -7,7 +7,7 @@
 				</h1>
 				<ul class="nav-aside">
 					<li class="nav-user">
-					  <router-link to="/login/Login">个人中心</router-link>
+					  <router-link to="/login">个人中心</router-link>
 						<!--active-->
 						<div class="nav-user-wrapper">
 							

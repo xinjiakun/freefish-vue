@@ -7,100 +7,19 @@
                     <span class="gray-blue-btn js-add-address"><a class="add" @click="addReceive">确认修改</a></span>
                 </div>
                 <div class="box-inner clear">
-                    <div v-if="receiveInfo.length">
-                      <div class="address-list-item default-item" v-for="receive,index in receiveInfo">
+                    <div >    
                         <div class="name fn-left">
-                            <div class="name-cell">{{receive.name}}</div>
+                            <div class="name-cell">
+                            <input type="text"  class="login_email"  placeholder="邮箱" v-model="userEmail">
+                            </div>
                         </div>
                         <div class="detail fn-left">
                             <div class="detail-cell">{{receive.province}} {{receive.city}} {{receive.county}} {{receive.add}}</div>
                         </div>
-                        <div class="operation fn-right">
-                            <div class="operation-cell">
-                                <a class="gray-edit-btn js-edit-address" @click="editReceive(receive,index)">修改</a>
-                                <span class="red-del-btn js-del-address"> <a>删除</a><em>删除</em> </span>
-                            </div>
-                        </div>
-                        <div class="default fn-right">
-                          <span v-if="receive.default">（默认地址）</span>
-                          <a v-else @click="checkDefaultHandle(receive)">设为默认</a>
-                        </div>
-                        <div class="telephone fn-right">{{receive.phone}}</div>
-                      </div>
-                    </div>
-                    <div class="address-form clear" v-else>
-                        <div class="module-form-row">
-                            <div class="form-item-v3">
-                                <i>收货人姓名</i>
-                                <input type="text" class="js-verify">
-                                <div class="verify-error"></div>
-                            </div>
-                        </div>
-                        <div class="module-form-row">
-                            <div class="form-item-v3">
-                                <i>手机号</i>
-                                <input type="text" class="js-verify">
-                                <div class="verify-error"></div>
-                            </div>
-                        </div>
-                        <div class="module-form-row clear">
-                            <div class="form-item-v3 area-code-w fn-left form-valid-item">
-                                <i>区号（可选）</i>
-                                <input type="text" class="js-verify js-address-area-code">
-                                <div class="verify-error"></div>
-                            </div>
-                            <div class="form-item-v3 telephone-w fn-right form-valid-item">
-                                <i>固定电话（可选）</i>
-                                <input type="text" class="js-verify js-address-telephone">
-                                <div class="verify-error"></div>
-                            </div>
-                        </div>
-                        <div class="module-form-row clear">
-                            <div class="form-item-v3 select-item province-wrapper">
-                                <select name="province_code" class="province select-province js-form-province js-verify">
-                                    <option value="0">请选择省份</option>
-                                    <option value="110000">北京市</option>
-                                    <option value="440000">广东省</option>
-                                    <option value="310000">上海市</option>
-                                    <option value="320000">江苏省</option>
-                                    <option value="330000">浙江省</option>
-                                    <option value="370000">山东省</option>
-                                    <option value="410000">河南省</option>
-                                    <option value="510000">四川省</option>
-                                    <option value="130000">河北省</option>
-                                    <option value="420000">湖北省</option>
-                                    <option value="340000">安徽省</option>
-                                    <option value="350000">福建省</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="module-form-row clear">
-                            <div class="form-item-v3 select-item city-wrapper fn-left form-focus-item">
-                                <select class="city select-city js-form-city js-verify">
-                                    <option value="0">请选择城市</option>
-                                </select>
-                            </div>
-                            <div class="form-item-v3 select-item district-wrapper fn-right form-focus-item">
-                                <select class="city select-city js-form-city js-verify">
-                                    <option value="0">请选择区县</option>
-                                    <option value="0">请选择区县</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="module-form-row">
-                            <div class="form-item-v3">
-                                <i>详细地址，如街道名称，楼层，门牌号码等</i>
-                                <input type="text" class="js-verify">
-                                <div class="verify-error"></div>
-                            </div>
-                        </div>
-                        <div class="module-form-row fn-clear">
-                            <input type="checkbox">
-                            <span class="blue-checkbox"></span>设为默认
-                        </div>
-                        <div class="dialog-blue-btn big-main-btn disabled-btn js-verify-address">
-                            <a>保存</a>
-                        </div>
+                        <input type="text"  class="login_email"  placeholder="邮箱" v-model="userEmail">
+                        <input type="password"  class="login_pwd"  placeholder="密码" v-model="password">
+                        <input type="text"  class="login_email"  placeholder="邮箱" v-model="userEmail">
+                        <input type="password"  class="login_pwd"  placeholder="密码" v-model="password">
                     </div>
                 </div>
             </div>
@@ -110,7 +29,48 @@
 </template>
 
 <script>
-	export default {}
+    import addressPop from '@/components/address-pop'
+    export default {
+    data () {
+      return {
+        popShow: false,
+        receiveInfo: [],
+        oldReceive: null,
+        receiveIndex: null
+      }
+    },
+    created () {
+      this.$store.state.receiveInfo.forEach((receive,index) => {
+        if(receive.default){
+          receive.checked = true
+          this.$store.state.receiveInfo.unshift(this.$store.state.receiveInfo.splice(index,1)[0])
+        }else{
+          receive.checked = false
+        }
+      })
+      this.receiveInfo = this.$store.state.receiveInfo
+    },
+    components: {
+      addressPop
+    },
+    methods: {
+      checkDefaultHandle (data) {
+        this.$store.commit('checkDefault',data)
+      },
+      addReceive () {
+        this.oldReceive = null
+        this.popShow = true
+      },
+      closePop () {
+        this.popShow = false
+      },
+      editReceive (data,index) {
+        this.oldReceive = data
+        this.receiveIndex = index
+        this.popShow = true
+      }
+    }
+  }
 </script>
 
 <style>

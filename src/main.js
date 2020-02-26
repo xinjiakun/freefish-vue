@@ -9,7 +9,7 @@ import ElementUI from 'element-ui';
 import VueResource from 'vue-resource'
 import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
-Vue.use(axios);
+Vue.prototype.axios = axios;
 Vue.use(VueResource)
 console.log(store)
 

@@ -6,8 +6,8 @@ import '@/assets/css/header.css'
 Vue.use(Router)
 
 import Home from '@/views/home'
-import Login from '@/views/login/Login'
-import Register from '@/views/login/Register'
+import Login from '@/views/login/login'
+import Register from '@/views/login/register'
 import Shop from '@/views/shop'
 import Item from '@/views/item'
 import Cart from '@/views/cart'
@@ -44,12 +44,12 @@ export default new Router({
       children: [
         {
           path: '/login',
-          name: 'login',
+          name: 'Login',
           component: Login
         },
         {
           path: '/register',
-          name: 'register',
+          name: 'Register',
           component: Register
         },
       ]
@@ -111,3 +111,4 @@ export default new Router({
     }
   ]
 })
+
