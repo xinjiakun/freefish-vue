@@ -22,7 +22,7 @@
                   </div>
                   <div class="module-form-row">
                     <div class="form-item-v3" :class="{'form-invalid-item':phoneError}">
-                      <input type="text" class="js-verify" placeholder="手机号" v-model="receive.phone" @blur="inspectPhone">
+                      <input type="text" class="js-verify" placeholder="手机号" v-model="receive.mobilePhone" @blur="inspectPhone" @focus="setPhoneError">
                       <div class="verify-error"></div>
                     </div>
                   </div>
@@ -60,13 +60,13 @@
                   </div>
                   <div class="module-form-row">
                     <div class="form-item-v3">
-                      <input type="text" class="js-verify" placeholder="详细地址，如街道名称，楼层，门牌号码等" v-model="receive.add">
+                      <input type="text" class="js-verify" placeholder="详细地址，如街道名称，楼层，门牌号码等" v-model="receive.street">
                       <div class="verify-error"></div>
                     </div>
                   </div>
                   <div class="module-form-row fn-clear">
                     <input type="checkbox" class="hide" value="1">
-                    <span class="blue-checkbox" :class="{'blue-checkbox-on':receive.default}" @click="chooseDefault"></span>设为默认
+                    <span class="blue-checkbox" :class="{'blue-checkbox-on':receive.defaultAddress}" @click="chooseDefault"></span>设为默认
                   </div>
                   <div class="dialog-blue-btn big-main-btn js-verify-address" :class="{'disabled-btn':!right}" @click="submitReceiveHandle">
                     <a>保存</a>
@@ -89,7 +89,7 @@
         addList,
         receive: {
           "name": "",
-          "phone": "",
+          "mobilePhone": "",
           "areaCode": "",
           "landLine": "",
           "provinceId": 0,
@@ -98,9 +98,9 @@
           "city": "",
           "countyId": 0,
           "county": "",
-          "add": "",
-          "default": false,
-          "checked": false
+          "street": "",
+          "defaultAddress": 0,
+          "checked": 0
         },
         cityList: [],
         couontyList: [],
@@ -131,7 +131,7 @@
         type: Number
       }
     },
-    watch: {
+    watch: {//监控
       ["receive.provinceId"] () {
         if (this.receive.provinceId!=0) {
           let province = this.addList.filter((province) => {
@@ -175,16 +175,16 @@
       ["receive.name"] () {
         this.inspectReceive()
       },
-      ["receive.phone"] () {
+      ["receive.mobilePhone"] () {
         this.inspectReceive()
       },
-      ["receive.add"] () {
+      ["receive.street"] () {
         this.inspectReceive()
       }
     },
     computed: {
-      receiveInfo () {
-        return this.$store.state.receiveInfo
+      addressInfo () {
+        return this.$store.state.addressInfo
       }
     },
     methods: {
@@ -192,24 +192,31 @@
         this.$emit('close')
       },
       chooseDefault () {
-        this.receive.default = !this.receive.default
+        this.receive.defaultAddress = !this.receive.defaultAddress
         this.receive.checked = !this.receive.checked
       },
-      inspectPhone () {
-        if (this.receive.phone.length!=11) {
+      inspectPhone () {//手机号前端验证
+        //手机号正则
+        var mPattern = /^1[34578]\d{9}$/; 
+        if (mPattern.test(this.receive.mobilePhone)==false) {
           this.phoneError = true
         } else {
           this.phoneError = false
         }
       },
+      setPhoneError(){
+        this.phoneError = false
+      },
       inspectReceive () {
-        if(this.receive.name&&this.receive.phone.length==11&&this.receive.province&&this.receive.city&&this.receive.county&&this.receive.add){
+        //手机号正则
+        var mPattern = /^1[34578]\d{9}$/;
+        if(this.receive.name&&mPattern.test(this.receive.mobilePhone)==true&&this.receive.province&&this.receive.city&&this.receive.county&&this.receive.street){
           this.right = true
         }else{
           this.right = false
         }
       },
-      submitReceiveHandle () {
+      submitReceiveHandle () {//一次‘管理收货地址’的提交
         this.$store.commit('submitReceive',[this.receive,this.receiveIndex])
         this.$emit('close')
       }

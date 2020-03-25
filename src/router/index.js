@@ -40,44 +40,58 @@ export default new Router({
     },
     {
       path: '/login',
-      component: Login,
-      children: [
-        {
-          path: '/login',
-          name: 'Login',
-          component: Login
-        },
-        {
-          path: '/register',
-          name: 'Register',
-          component: Register
-        },
-      ]
+      name: 'Login',
+      meta: {
+        isLogin: false
+      },
+      component: Login
     },
-
+    {
+      path: '/register',
+      name: 'Register',
+      meta: {
+        isLogin: false
+      },
+      component: Register
+    },    
     {
       path: '/shop',
       name: 'Shop',
+      meta: {
+        isLogin: false
+      },
       component: Shop
     },
     {
       path: '/item',
       name: 'Item',
+      meta: {
+        isLogin: true
+      },
       component: Item
     },
     {
       path: '/cart',
       name: 'Cart',
+      meta: {
+        isLogin: true
+      },
       component: Cart
     },
     {
       path: '/checkout',
       name: 'Checkout',
+      meta: {
+        isLogin: true
+      },
       component: Checkout
     },
     {
       path: '/payment',
       name: 'Payment',
+      meta: {
+        isLogin: true
+      },
       component: Payment
     },
     {
@@ -87,16 +101,25 @@ export default new Router({
         {
           path: '',
           name: 'Account',
+          meta: {
+            isLogin: true
+          },
           component: Order
         },
         {
           path: '/address',
           name: 'Address',
+          meta: {
+            isLogin: true
+          },
           component: Address
         },
         {
           path: '/information',
           name: 'Information',
+          meta: {
+            isLogin: true
+          },
           component: Information
         },
         {

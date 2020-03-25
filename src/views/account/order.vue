@@ -4,78 +4,48 @@
 			<div class="gray-box">
 				<div class="title columns-title pre-title">
 					<h2>我的订单</h2>
-					<div class="gray-btn-menu sort-status-menu">
-						<span class="label"><i class="arrow"></i> 全部状态 </span>
-						<ul class="menu-list">
-							<li class="selected">
-								<a href="javascript:;">全部状态</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">未完成</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">已完成</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">已关闭</a>
-							</li>
-						</ul>
-					</div>
-					<div class="gray-btn-menu sort-time-menu -gray-btn-menu-on">
-						<span class="label"><i class="arrow"></i> 最近三个月 </span>
-						<ul class="menu-list">
-							<li class="selected">
-								<a href="javascript:;">最近三个月</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">今年内</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">2016年</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">2015年</a>
-							</li>
-						</ul>
-					</div>
+					<span class="gray-blue-btn js-edit-address"><a class="add" href="/shop">现在购买</a></span>
 				</div>
 				<div class="js-list-inner">
-					<div class="box-inner order-cart order-list-cart clear" v-for="order,index in orderData">
+					<div class="box-inner order-cart order-list-cart clear" v-for="receive in orderDetails" >
 						<div class="gray-sub-title cart-title">
-							<span class="date">{{order.iDate}}</span>
-							<span class="order-id"> 订单号： <a href="javascript:;">{{order.orderId}}</a> </span>
-							<span class="order-detail"><router-link :to="{name: 'Payment', query: {orderId:order.orderId}}">查看详情&gt;</router-link> </span> <span class="sub-total">应付总额</span>
-							<span class="operation">商品操作</span>
+							<span class="date"></span>
+							<span class="order-id"> 订单号： <a href="javascript:;">{{receive.orderId}}</a> </span>
+							<span class="order-detail"><router-link :to="{name: 'Account'}">&nbsp;</router-link> </span> 
+							<span class="sub-total"><router-link :to="{name: 'Account'}">&nbsp;</router-link></span>
+							<span class="operation">订单状态</span>
 							<span class="num">数量</span>
 							<span class="price">单价</span>
 						</div>
 						<div class="cart">
-							<div class="cart-items clear" v-for="item,index in order.goodsData">
+							<div class="cart-items clear">
 								<div class="prod-info clear">
 									<div class="items-thumb">
-										<a href="javascript:;" target="_blank"><img :src="item.ali_image+'?x-oss-process=image/resize,w_80/quality,Q_100/format,webp'"></a>
+										<a href="javascript:;" target="_blank"><img :src="receive.aliImage+'?x-oss-process=image/resize,w_80/quality,Q_100/format,webp'"></a>
 									</div>
 									<div class="items-params clear">
 										<div class="name vh-center">
-											<a href="javascript:;" target="_blank" :title="item.title+'（'+item.spec_json.show_name+'）'">{{item.title}}（{{item.spec_json.show_name}}）</a>
+											<a href="javascript:;" target="_blank" :title="receive.title">{{receive.title}}</a>
 										</div>
 										<div class="detail"></div>
 									</div>
-									<div class="operation">
-										<div class="operation-list">
-	
-										</div>
+									<div class="price">
+										<div class="operation-list" v-if="receive.state==1"><a href="javascript:;">商品运送中</a></div>
+										<div class="operation-list" v-if="receive.state==2"><a href="javascript:;">订单已完成</a></div>
+										<div class="operation-list" v-if="receive.state==0"><a href="javascript:;">退款中</a></div>
 									</div>
-									<div class="num">{{item.count}}</div>
-									<div class="price">¥ {{item.price}}.00</div>
+									<div class="num">1</div>
+									<div class="price">¥ {{receive.price}}.00</div>
 								</div>
 							</div>
 						</div>
 						<div class="prod-operation">
-							<div class="total">¥ {{order.price+order.freight}}.00</div>
+							<div class="total">
+								<button class="blue-small-btn js-payment-order" v-if="receive.state==1" v-on:click="confirmReceipt(receive.id,receive.goodId)">确认收货</button>
+								
+							</div>
 							<div class="status">
-								<router-link :to="{name: 'Payment', query: {orderId:order.orderId}}" class="blue-small-btn js-payment-order" v-if="!order.isPay">现在付款</router-link>
-								<span v-else>已完成</span>
+								<button class="blue-small-btn js-payment-order" v-if="receive.state==1" v-on:click="requestRefund(receive.id,receive.goodId)">申请退款</button>
 							</div>
 						</div>
 					</div>
@@ -86,12 +56,57 @@
 </template>
 
 <script>
+import { myPost, myGet } from '@/components/api'
 	export default {
-	  computed: {
-	    orderData () {
-	      return this.$store.state.orderData
-	    }
-	  }
+		data(){
+			return {
+				orderDetails : '',
+				orderId:'',
+				goodId:''
+			}
+		},
+		mounted(){
+			let data1 = new FormData();
+            let u = localStorage.getItem('userId');
+            data1.append('userId',u)
+            myPost('api/order/all',data1).then(res=>{
+				if(res.data.result != null){
+					this.orderDetails = res.data.result;
+				}
+				console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"+res.data.result[0].goodId);
+			})
+		},
+		computed: {
+			orderData () {
+			return 
+			}
+		},
+		methods: {
+			confirmReceipt (orderId1,goodId1) {
+				let data1 = new FormData();
+				data1.append("orderId",orderId1);
+				data1.append("goodId",goodId1);
+				console.log("orderId1---"+typeof(orderId1));
+				console.log("goodId1---"+goodId1+"--"+typeof(goodId1));
+				myPost('api/order/confirmReceipt',data1).then(res=>{
+					if(res.data.result != 0){
+						console.log("确认收货成功！")
+						location. reload()
+					}
+				})
+			},
+			requestRefund (orderId1,goodId1) {
+				let data1 = new FormData();
+				data1.append("orderId",orderId1);
+				data1.append("goodId",goodId1);
+				myPost('api/order/requestRefund',data1).then(res=>{
+					if(res.data.result != 0){
+						console.log("订单取消，退款申请中！")
+						location. reload()
+					}
+				})
+			},
+		}
 	}
 </script>
 
@@ -145,7 +160,7 @@
     background: url(../../assets/img/btn-icon-new.png) -15px -571px no-repeat;
 }
 .gray-btn-menu .menu-list{
-	display: none;
+	/* display: ; */
     position: absolute;
     right: -1px;
     top: -1px;

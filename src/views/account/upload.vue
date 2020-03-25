@@ -3,80 +3,63 @@
 		<div class="account-order">
 			<div class="gray-box">
 				<div class="title columns-title pre-title">
-					<h2>我的订单</h2>
-					<div class="gray-btn-menu sort-status-menu">
-						<span class="label"><i class="arrow"></i> 全部状态 </span>
-						<ul class="menu-list">
-							<li class="selected">
-								<a href="javascript:;">全部状态</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">未完成</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">已完成</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">已关闭</a>
-							</li>
-						</ul>
-					</div>
-					<div class="gray-btn-menu sort-time-menu -gray-btn-menu-on">
-						<span class="label"><i class="arrow"></i> 最近三个月 </span>
-						<ul class="menu-list">
-							<li class="selected">
-								<a href="javascript:;">最近三个月</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">今年内</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">2016年</a>
-							</li>
-							<li class="">
-								<a href="javascript:;">2015年</a>
-							</li>
-						</ul>
-					</div>
+					<h2>我的上传</h2>
+					<span class="gray-blue-btn js-add-address"><a class="add" @click="uploadGood">点击上传</a></span>
 				</div>
 				<div class="js-list-inner">
-					<div class="box-inner order-cart order-list-cart clear" v-for="order,index in orderData">
+					<div class="box-inner order-cart order-list-cart clear">
 						<div class="gray-sub-title cart-title">
-							<span class="date">{{order.iDate}}</span>
-							<span class="order-id"> 订单号： <a href="javascript:;">{{order.orderId}}</a> </span>
-							<span class="order-detail"><router-link :to="{name: 'Payment', query: {orderId:order.orderId}}">查看详情&gt;</router-link> </span> <span class="sub-total">应付总额</span>
-							<span class="operation">商品操作</span>
-							<span class="num">数量</span>
-							<span class="price">单价</span>
+							<span class="date">标题：</span>
+							<input v-model="newGoodTitle1" placeholder="为商品起一个吸引人的标题">
 						</div>
-						<div class="cart">
-							<div class="cart-items clear" v-for="item,index in order.goodsData">
-								<div class="prod-info clear">
-									<div class="items-thumb">
-										<a href="javascript:;" target="_blank"><img :src="item.ali_image+'?x-oss-process=image/resize,w_80/quality,Q_100/format,webp'"></a>
-									</div>
-									<div class="items-params clear">
-										<div class="name vh-center">
-											<a href="javascript:;" target="_blank" :title="item.title+'（'+item.spec_json.show_name+'）'">{{item.title}}（{{item.spec_json.show_name}}）</a>
-										</div>
-										<div class="detail"></div>
-									</div>
-									<div class="operation">
-										<div class="operation-list">
-	
-										</div>
-									</div>
-									<div class="num">{{item.count}}</div>
-									<div class="price">¥ {{item.price}}.00</div>
-								</div>
+						<div class="gray-sub-title cart-title">
+							<span class="date">商品简介：</span>
+							<input v-model="newGoodSubTitle1" placeholder="使用场景、功能...">
+						</div>
+						<div class="gray-sub-title cart-title">
+							<span class="date">主图上传：</span>
+							<input  @change='add_img($event)' type="file">
+						</div>
+						<div class="form-group">
+      						<label class="control-label">上传图片</label>
+							<div class="control-form">
+								<p class="help-block">(建议图片格式为：JPEG/BMP/PNG/GIF，大小不超过5M，最多可上传4张)</p>
+								<ul class="upload-imgs">
+								<li v-if="imgLen>=4 ? false : true">
+									<input type="file" class="upload" @change="addImg" ref="inputer" multiple accept="image/png,image/jpeg,image/gif,image/jpg"/>
+									<a class="add"><i class="iconfont icon-plus"></i><p>点击上传</p></a>
+								</li>
+								<li v-for="(value, key) in imgs">
+									<p class="img"><img :src="getObjectURL(value)"><a class="close" @click="delImg(key)">×</a></p>
+								</li>
+								</ul>
 							</div>
 						</div>
-						<div class="prod-operation">
-							<div class="total">¥ {{order.price+order.freight}}.00</div>
-							<div class="status">
-								<router-link :to="{name: 'Payment', query: {orderId:order.orderId}}" class="blue-small-btn js-payment-order" v-if="!order.isPay">现在付款</router-link>
-								<span v-else>已完成</span>
-							</div>
+						<div class="gray-sub-title cart-title">
+							<span class="date">出售价格：</span>
+							<input v-model="newGoodPrice1" placeholder="请输入整数价格 ">.00 ¥
+						</div>
+						<div class="gray-sub-title cart-title">
+							<span class="date">邮费：</span>
+							<input v-model="newGoodPostage1" placeholder="请输入整数价格 ">.00 ¥
+						</div>
+						<div class="gray-sub-title cart-title">
+							<span class="date">商品类别：</span>
+							<select class="gray-sub-title cart-title" id="goodtype">
+								<option value="0">商品类别</option>
+								<option value="1">电子数码</option>
+								<option value="2">类别2</option>
+								<option value="3">类别3</option>
+                            </select>
+						</div>
+						<div class="gray-sub-title cart-title">
+							<span class="date">新旧程度：</span>
+							<select class="gray-sub-title cart-title" id="goodold" >
+								<option value="0">新旧程度</option>
+								<option value="1">全新</option>
+								<option value="2">9成新</option>
+								<option value="3">8成新</option>
+                            </select>
 						</div>
 					</div>
 				</div>
@@ -86,16 +69,135 @@
 </template>
 
 <script>
+import { myPost, myGet } from '@/components/api'
 	export default {
-	  computed: {
-	    orderData () {
-	      return this.$store.state.orderData
-	    }
-	  }
+	  	data () {
+    		return {
+				newGoodTitle1:'',
+				newGoodSubTitle1:'',
+				newGoodPrice1:'',
+				imgs: [],
+				fil:[],
+				img: '',
+        		imgData: {
+            		accept: 'image/gif, image/jpeg, image/png, image/jpg',
+				},
+				formData:new FormData(),
+        		imgs: {},
+        		imgLen:0,
+    		}
+  		},
+	  	computed: {
+	    	orderData () {
+	      		return this.$store.state.orderData
+	    	}
+		},
+		methods:{
+			add_img(event){  
+				let reader = new FileReader();
+				this.img = event.target.files[0];
+				console.log(this.img);
+            	let img1=event.target.files[0];
+            	let type=img1.type;//文件的类型，判断是否是图片
+            	let size=img1.size;//文件的大小，判断图片的大小
+            	if(this.imgData.accept.indexOf(type) == -1){
+                	alert('请选择gif/jpeg/png/jpg的图片格式！');
+                	return false;
+            	}
+            	// if(size>3145728){
+                // 	alert('请选择3M以内的图片！');
+                // 	return false;
+            	// }
+			},
+			addImg(event){
+				let inputDOM = this.$refs.inputer;
+				// 通过DOM取文件数据
+				this.fil = inputDOM.files;
+				let oldLen=this.imgLen;
+				let len=this.fil.length+oldLen;
+				// console.log(len);
+				if(len>4){
+					alert('最多可上传4张，您还可以上传'+(4-oldLen)+'张');
+					return false;
+				}
+				for (let i=0; i < this.fil.length; i++) {
+					let size = Math.floor(this.fil[i].size / 1024);
+					if (size > 10*1024*1024) {
+						alert('请选择5M以内的图片！');
+						return false
+					}
+					this.imgLen++;
+					this.$set(this.imgs,this.fil[i].name+'?'+new Date().getTime()+i,this.fil[i]);
+				}
+			},
+			getObjectURL(file) {
+				var url = null ;
+				if (window.createObjectURL!=undefined) { // basic
+					url = window.createObjectURL(file) ;
+				} else if (window.URL!=undefined) { // mozilla(firefox)
+					url = window.URL.createObjectURL(file) ;
+				} else if (window.webkitURL!=undefined) { // webkit or chrome
+					url = window.webkitURL.createObjectURL(file) ;
+				}
+				return url ;
+			},
+			delImg(key){
+				this.$delete(this.imgs,key);
+				this.imgLen--;
+			},
+			submit(){
+				for(let key in this.imgs){
+					let name=key.split('?')[0];
+					this.formData.append('multipartFiles',this.imgs[key],name);
+				}
+				this.$http.post('/opinion/feedback', this.formData,{
+					headers: {'Content-Type': 'multipart/form-data'}
+					}).then(res => {
+					this.alertShow=true;
+				});
+			},
+			uploadGood(){//上传新商品
+				console.log('上传新商品');
+				let data1 = new FormData();
+				let u = localStorage.getItem('userId');
+				data1.append('userId',u);
+				data1.append('goodtitle',this.newGoodTitle1);
+				data1.append('goodsubtitle',this.newGoodSubTitle1);
+				data1.append('goodprice',parseInt(this.newGoodPrice1));
+				data1.append('goodpostage',parseInt(this.newGoodPostage1));
+				data1.append('goodtype',parseInt(document.getElementById('goodtype').value));
+				data1.append('goodold',parseInt(document.getElementById('goodold').value));
+				data1.append('aliImg1',this.img);//主图file类型
+				
+				for(let key in this.imgs){
+					let name=key.split('?')[0];
+					console.log(this.imgs[key]+'---'+name);
+					data1.append('aliImg2',this.imgs[key])
+				}
+				myPost('api/upload/uploadNewGoods',data1).then(res=>{
+					if(res.data.result != 0){
+						console.log('上传商品成功');
+						this.$router.push({name: 'Home'})
+
+					}
+				})
+			}
+		}  
 	}
 </script>
 
-<style>
+<style >
+.upload-imgs{margin: 10px 0 30px 0;overflow: hidden;font-size: 0;}
+.upload-imgs li{position: relative;width: 118px;height: 118px;font-size: 14px;display: inline-block;padding: 10px;margin-right: 25px;border: 2px dashed #ccc;text-align: center;vertical-align: middle;}
+.upload-imgs li:hover{border-color: $them-color;}
+.upload-imgs .add{display: block;background-color:#ccc;color: #ffffff;height: 94px;padding: 8px 0;}
+.upload-imgs .add .iconfont{padding: 10px 0;font-size: 40px;}
+.upload-imgs li:hover .add{background-color: $them-color;}
+.upload-imgs li .upload{position: absolute;top: 0;bottom: 0;left: 0;right: 0;width: 118px;height: 118px;}
+.upload-imgs .img{position: relative;width: 94px;height: 94px;line-height: 94px;}
+.upload-imgs .img img{vertical-align: middle;}
+.upload-imgs .img .close{display: none;}
+.upload-imgs li:hover .img .close{display: block;position: absolute;right: -6px;top: -10px;line-height: 1;font-size: 22px;color: #aaa;}
 .account-order .gray-box{
 	margin-bottom: 20px;
 }

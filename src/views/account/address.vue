@@ -7,100 +7,26 @@
                     <span class="gray-blue-btn js-add-address"><a class="add" @click="addReceive">添加新地址</a></span>
                 </div>
                 <div class="box-inner clear">
-                    <div v-if="receiveInfo.length">
-                      <div class="address-list-item default-item" v-for="receive,index in receiveInfo">
+                    <div v-if="$store.getters.addressInfo.length">
+                      <div class="address-list-item default-item" v-for="receive,index in $store.getters.addressInfo">
                         <div class="name fn-left">
                             <div class="name-cell">{{receive.name}}</div>
                         </div>
                         <div class="detail fn-left">
-                            <div class="detail-cell">{{receive.province}} {{receive.city}} {{receive.county}} {{receive.add}}</div>
+                            <div class="detail-cell">{{receive.province}} {{receive.city}} {{receive.county}} {{receive.street}}</div>
                         </div>
                         <div class="operation fn-right">
                             <div class="operation-cell">
                                 <a class="gray-edit-btn js-edit-address" @click="editReceive(receive,index)">修改</a>
-                                <span class="red-del-btn js-del-address"> <a>删除</a><em>删除</em> </span>
+                                <span class="red-del-btn js-del-address"> <a @click="deleteReceive(receive,index)">删除</a><em>删除</em> </span>
                             </div>
                         </div>
                         <div class="default fn-right">
-                          <span v-if="receive.default">（默认地址）</span>
+                          <span v-if="receive.defaultAddress==1">（默认地址）</span>
                           <a v-else @click="checkDefaultHandle(receive)">设为默认</a>
                         </div>
-                        <div class="telephone fn-right">{{receive.phone}}</div>
+                        <div class="telephone fn-right">{{receive.mobilePhone}}</div>
                       </div>
-                    </div>
-                    <div class="address-form clear" v-else>
-                        <div class="module-form-row">
-                            <div class="form-item-v3">
-                                <i>收货人姓名</i>
-                                <input type="text" class="js-verify">
-                                <div class="verify-error"></div>
-                            </div>
-                        </div>
-                        <div class="module-form-row">
-                            <div class="form-item-v3">
-                                <i>手机号</i>
-                                <input type="text" class="js-verify">
-                                <div class="verify-error"></div>
-                            </div>
-                        </div>
-                        <div class="module-form-row clear">
-                            <div class="form-item-v3 area-code-w fn-left form-valid-item">
-                                <i>区号（可选）</i>
-                                <input type="text" class="js-verify js-address-area-code">
-                                <div class="verify-error"></div>
-                            </div>
-                            <div class="form-item-v3 telephone-w fn-right form-valid-item">
-                                <i>固定电话（可选）</i>
-                                <input type="text" class="js-verify js-address-telephone">
-                                <div class="verify-error"></div>
-                            </div>
-                        </div>
-                        <div class="module-form-row clear">
-                            <div class="form-item-v3 select-item province-wrapper">
-                                <select name="province_code" class="province select-province js-form-province js-verify">
-                                    <option value="0">请选择省份</option>
-                                    <option value="110000">北京市</option>
-                                    <option value="440000">广东省</option>
-                                    <option value="310000">上海市</option>
-                                    <option value="320000">江苏省</option>
-                                    <option value="330000">浙江省</option>
-                                    <option value="370000">山东省</option>
-                                    <option value="410000">河南省</option>
-                                    <option value="510000">四川省</option>
-                                    <option value="130000">河北省</option>
-                                    <option value="420000">湖北省</option>
-                                    <option value="340000">安徽省</option>
-                                    <option value="350000">福建省</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="module-form-row clear">
-                            <div class="form-item-v3 select-item city-wrapper fn-left form-focus-item">
-                                <select class="city select-city js-form-city js-verify">
-                                    <option value="0">请选择城市</option>
-                                </select>
-                            </div>
-                            <div class="form-item-v3 select-item district-wrapper fn-right form-focus-item">
-                                <select class="city select-city js-form-city js-verify">
-                                    <option value="0">请选择区县</option>
-                                    <option value="0">请选择区县</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="module-form-row">
-                            <div class="form-item-v3">
-                                <i>详细地址，如街道名称，楼层，门牌号码等</i>
-                                <input type="text" class="js-verify">
-                                <div class="verify-error"></div>
-                            </div>
-                        </div>
-                        <div class="module-form-row fn-clear">
-                            <input type="checkbox">
-                            <span class="blue-checkbox"></span>设为默认
-                        </div>
-                        <div class="dialog-blue-btn big-main-btn disabled-btn js-verify-address">
-                            <a>保存</a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -111,6 +37,7 @@
 
 <script>
   import addressPop from '@/components/address-pop'
+  import { myPost, myGet } from '@/components/api'
   export default {
     data () {
       return {
@@ -120,22 +47,36 @@
         receiveIndex: null
       }
     },
-    created () {
-      this.$store.state.receiveInfo.forEach((receive,index) => {
-        if(receive.default){
-          receive.checked = true
-          this.$store.state.receiveInfo.unshift(this.$store.state.receiveInfo.splice(index,1)[0])
-        }else{
-          receive.checked = false
+    mounted () { //加载页面即执行
+      let data1 = new FormData();
+      let u = localStorage.getItem('userId');
+      data1.append('userId',u)
+      myPost('api/address',data1).then(res=>{
+        if(res.data.result != null){
+          this.$store.commit("setAddressInfo",res.data.result);
+        }else{//新用户还没有添加过地址
+          alert('请点击添加地址按钮');
+          addReceive;
+          
         }
       })
-      this.receiveInfo = this.$store.state.receiveInfo
+    },
+    created () {
+      this.$store.state.addressInfo.forEach((receive,index) => {//检测默认地址选中状态
+        if(receive.defaultAddress == 1){
+          receive.checked = 1
+          this.$store.state.addressInfo.unshift(this.$store.state.addressInfo.splice(index,1)[0])
+        }else{
+          receive.checked = 0
+        }
+      })
+      this.addressInfo = this.$store.state.addressInfo
     },
     components: {
       addressPop
     },
     methods: {
-      checkDefaultHandle (data) {
+      checkDefaultHandle (data) { //更改默认地址
         this.$store.commit('checkDefault',data)
       },
       addReceive () {
@@ -145,10 +86,21 @@
       closePop () {
         this.popShow = false
       },
-      editReceive (data,index) {
+      editReceive (data,index) { //编辑更新原有地址
         this.oldReceive = data
         this.receiveIndex = index
         this.popShow = true
+      },
+      deleteReceive (data,index) { //删除原有地址
+        console.log('deletereceive'+data.id+typeof(data.id)+index)
+        let data1 = new FormData();
+        data1.append('id',data.id);
+        myPost('api/address/deleteAddress',data1).then(res=>{
+          if(res.data.result != null){
+            console.log('删除成功')
+            this.$router.go(0);
+          }
+        })
       }
     }
   }

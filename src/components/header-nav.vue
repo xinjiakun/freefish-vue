@@ -13,21 +13,28 @@
 							
 							<div class="nav-user-list">
 								<dl class="nav-user-avatar">
-									<dd><span class="ng-scope"></span></dd>
-									<dt class="ng-binding">222</dt>
+									<dd><span class="ng-scope">
+										<img :src="$store.getters.userHeadimg+'?x-oss-process=image/resize,w_80/quality,Q_100/format,webp'" width="45px" height="45px">
+										</span>
+									</dd>
+									<dt class="ng-binding">{{$store.getters.userName}}</dt>
 								</dl>
 								<ul>
 									<li class="order"><router-link to="/account" exact>我的订单</router-link></li>
 									<li class="order"><router-link to="/information" exact>个人信息</router-link></li>
 									<li class="address"><router-link to="/address">收货地址</router-link></li>
 									<li class="information"><router-link to="/upload">商品发布</router-link></li>
-								    <li class="logout"><a href="javascript:;">退出</a></li>
+								    <li class="logout">
+										<a href="/" @click="loginOut()">
+											退出
+										</a>
+									</li>
 								</ul>
 							</div>
 						</div>
 					</li>
-					<!--active-->
-					<car-panel class="nav-cart"></car-panel>
+					<!--购物车-->
+					<li class="nav-cart"></li>
 				</ul>
 				<el-input placeholder="请输入内容" prefix-icon="el-icon-search" v-model="state1"
 					clearable style="margin-left: 70px; width:200px; float: right; margin: 30px 50px 0 0"
@@ -74,7 +81,7 @@ export default {
     CarPanel
   },
   methods: {
-	  querySearch(queryString, cb) {   
+	querySearch(queryString, cb) {   
         this.$http({
             url: "http://localhost:8067/api/nowSelect",
             method: "post",
@@ -102,6 +109,37 @@ export default {
 			this.$emit('getGoods',res.data);
 		})
 		
+	},
+
+	loginOut(next){
+		//获取用户登录成功后储存的登录标志
+		let getFlag = localStorage.getItem("Flag");
+		//如果登录标志存在且为isLogin，即用户已登录
+  		if(getFlag === "isLogin"){
+			let ensure;
+			ensure = confirm("确认退出账号？");
+			if(ensure == true){
+				localStorage.removeItem("Flag");//去掉登录标记
+				//去掉整个state中的用户信息
+				localStorage.removeItem("userId");
+				localStorage.removeItem("userName");
+				localStorage.removeItem("userEmail");
+				localStorage.removeItem("userNumber");
+				localStorage.removeItem("userCredit");
+				localStorage.removeItem("userInformation");
+				localStorage.removeItem("userGender");
+				localStorage.removeItem("userHeadimg");
+				localStorage.removeItem("addressInfo")
+			}else{    //不退出登录，返回首页
+				next({
+        			path: '/',
+      			})
+			}	
+		}else{//用户还没有登录成功，无反应，跳转到首页
+			next({
+				path: '/',
+			})
+		}
 	}
   }
 }

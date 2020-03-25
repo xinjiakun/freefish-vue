@@ -5,44 +5,93 @@
           <h4>新用户注册</h4>
       </div>
       <div class="register_form">
-        <input type="text"  class="login_email"  placeholder="邮箱" v-model="userEmail">
-        <input type="password"  class="login_pwd"  placeholder="密码" v-model="userPwd">
-        <el-button class="login_btn" @click.native="login" type="primary" round :loading="isBtnLoading">注册</el-button>
+        <input type="text"  class="login_email" @blur.prevent="emailStandard()" placeholder="邮箱" v-model="email">
+        <input type="text"  class="login_name"  placeholder="用户名" v-model="name">
+        <input type="password"  class="login_pwd1" @blur.prevent="pwdStandard()" placeholder="密码" v-model="pwd">
+        <input type="password"  class="login_pwd2" @blur.prevent="changeCount()" placeholder="密码确认" v-model="ensureUserPwd">
+        <el-button class="login_btn" @click.native="register" type="primary" round :loading="isBtnLoading">
+          注册
+        </el-button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+  import { myPost, myGet } from '@/components/api'
 	export default {
     data() {
       return {
-        userEmail: '',
-        userPwd: '',
+        email: '',
+        name: '',
+        pwd: '',
+        ensureUserPwd: '',
         isBtnLoading: false
-      }
-    },
-    created () {
-      if(JSON.parse( localStorage.getItem('user')) && JSON.parse( localStorage.getItem('user')).userName){
-        this.userEmail = JSON.parse( localStorage.getItem('user')).userEmail;
-        this.userPwd = JSON.parse( localStorage.getItem('user')).userPwd;
       }
     },
     computed: {
       btnText() {
-        if (this.isBtnLoading) return '登录中...';
-        return '登录';
+        if (this.isBtnLoading) return '注册中...';
+        return '注册';
       }
     },
     methods: {
-      login() {
-        if (!this.userEmail) {
+      emailStandard(){
+        //Email正则
+        var ePattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+        if (ePattern.test(this.userEmail) == false) {         
+          console.log('开始邮箱格式判断');
           this.$message.error('请输入正确邮箱');
-          return;
+          return -1;
+        }else{
+          
         }
-        if (!this.userPwd) {
-          this.$message.error('请输入正确密码');
-          return;
+      },
+      pwdStandard(){
+        if (this.pwd.length < 6) {
+          this.$message.error('密码必须大于6个字符');
+          return -1;
+        }else{
+          return 0;
+        }
+      },
+      changeCount:function(){
+        if(this.pwd != this.ensureUserPwd){
+          this.$message.error('前后密码必须一致');
+          return -1;
+        }else{
+          return 0;
+        }
+      },
+      register(next) {
+        if(!this.email && this.pwd.length <= 6 && this.pwd != this.ensureUserPwd){
+          this.$message.error('请检查邮箱格式，保证密码一致');
+        }else{
+          let data1 = new FormData();
+          data1.append('email',this.email);
+          data1.append('name',this.name);
+          data1.append('credit',parseInt(100));
+          data1.append('pwd',this.pwd);
+          myPost('api/register',data1).then(res=>{
+            if(res.data.result != 0){
+              //注册成功即登录
+              this.$store.dispatch("userLogin", true);
+              
+              //设置登录成功标志
+              localStorage.setItem("Flag","isLogin");
+              this.$store.commit("setUserName",res.data.result.name);  
+              this.$store.commit("setUserEmail",res.data.result.email);
+              this.$store.commit('setUserId',res.data.result.id);
+              this.$store.commit('setUserCredit',parseInt(100));
+              console.log('此用户id:'+ res.data.result.id);
+              alert("欢迎注册，现在您可以尽情使用了");
+              
+              //跳转到个人中心
+              this.$router.push("/information");
+            }else{
+              this.$message.error('注册失败，请重试');
+            }
+          })
         }
  
       }

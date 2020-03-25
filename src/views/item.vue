@@ -117,6 +117,7 @@ export default {
       myPost('item/good',data).then(res=>{
         this.itemsInfo=res.data.result;
         this.imgUrl = res.data.result.aliImage;
+        // console.log(this.itemsInfo.postage)
       })
   },
   methods: {
@@ -163,13 +164,16 @@ export default {
     },
     checkOutHandle () {
       let itemsInfo = this.itemsInfo
-      itemsInfo.count = this.count
       let provisionalOrder = {
+        itemId: this.itemsInfo.id,
+        itemName: this.itemsInfo.title,
         totlePrice: this.count * this.itemsInfo.price,
-        totleCount: this.count,
-        items: [itemsInfo]
+        // totleCount: this.count,
+        totlePostage: this.itemsInfo.postage,
+        // items: [itemsInfo]
       }
-      this.$store.commit('checkOut',provisionalOrder)
+      
+      sessionStorage.setItem("userOrder",JSON.stringify(provisionalOrder))
       this.$router.push({name: 'Checkout'})
     },
     addCarPanelHandle () {

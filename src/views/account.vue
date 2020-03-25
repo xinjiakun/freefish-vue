@@ -5,7 +5,8 @@
 				<div class="account-sidebar">
 					<div class="avatar gray-box clear">
 						<div class="js-account-sidebar-info">
-							<img src="http://static.smartisanos.cn/account/asset/img/default-user-avatar.png">
+							<!-- <img src="http://static.smartisanos.cn/account/asset/img/default-user-avatar.png"> -->
+                            <img :src="$store.getters.userHeadimg+'?x-oss-process=image/resize,w_80/quality,Q_100/format,webp'">
 						</div>
 						<div class="box-inner">
 							<ul class="account-nav">

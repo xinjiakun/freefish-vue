@@ -9,15 +9,11 @@
 					<div class="box-inner js-checkout-address-panel ">
 						<div class="address-common-table js-multiple-address-panel">
 							<ul class="address-item-list clear js-address-item-list">
-								<li class="js-choose-address " :class="{'selected-address-item':info.checked}" v-for="info,index in receiveInfo" @click="selectedAddress(info)">
+								<li class="js-choose-address " :class="{'selected-address-item':receive.checked==1}" v-for="receive,index in $store.getters.addressInfo" @click="selectedAddress(receive)">
 									<div class="address-item">
-										<div class="name-section"> {{info.name}} </div>
-										<div class="mobile-section">{{info.phone}}</div>
-										<div class="detail-section"> {{info.province}} {{info.city}} {{info.county}}<br> {{info.add}} </div>
-									</div>
-									<div class="operation-section">
-										<span class="update-btn js-edit-address">修改</span>
-										<span class="delete-btn js-delete-address" data-id="765375">删除</span>
+										<div class="name-section">{{receive.name}}</div>
+										<div class="mobile-section">{{receive.mobilePhone}}</div>
+										<div class="detail-section">{{receive.province}} {{receive.city}} {{receive.county}}<br> {{receive.street}}</div>
 									</div>
 								</li>
 								<li class="add-address-item js-add-address" @click="addReceive">
@@ -29,61 +25,25 @@
 				</div>
 			</div>
 			<div class="gray-box">
-				<div class="title">
-					<h2>发票信息</h2>
-				</div>
-				<div class="box-inner invoice-box js-invoice-box">
-					<p class="invoice-detail"> 发票类型：电子发票 </p>
-					<div class="invoice-detail"> 发票抬头：
-						<div class="radio-box">
-							<label> 
-										<input type="radio" class="hide"> 
-										<span class="blue-radio" :class="{'blue-radio-on':invoice.personal}" @click="checkedInvoice(true)"><a></a></span>  个人
-									</label>
-							<label> 
-										<input type="radio" class="hide"> 
-										<span class="blue-radio" :class="{'blue-radio-on':!invoice.personal}" @click="checkedInvoice(false)"><a></a></span>  单位
-									</label>
-						</div>
-						<div class="module-form-row form-item js-invoice-title" v-show="!invoice.personal">
-							<div class="module-form-item-wrapper no-icon small-item">
-								<i v-show="!invoice.name">请填写公司发票抬头</i>
-								<input type="text" class="js-verify" v-model="invoice.name">
-								<div class="verify-error" v-show="!invoice.name">必填</div>
-							</div>
-						</div>
-					</div>
-					<p class="invoice-detail">发票内容：购买商品明细</p>
-					<p class="invoice-label"> 电子发票是税务局认可的有效收付款凭证，可作为售后服务凭据。电子发票打印后可以用于企业报销。 </p>
-				</div>
-			</div>
-			<div class="gray-box">
 				<div class="title pre-title">
 					<h2>购物清单</h2>
 				</div>
 				<div class="box-inner ui-goods-cart">
 					<div class="gray-sub-title cart-table-title">
-						<span class="name">商品名称</span>
-						<span class="subtotal">小计</span>
+						<span class="name">商品名称</span>						
 						<span class="num">数量</span>
 						<span class="price">单价</span>
 					</div>
 					<div class="cart-table">
 						<div class="cart-group js-cart-group">
-							<div class="cart-items" v-for="item,index in carPanelData">
-								<div class="items-thumb">
-									<a href="javascript:;" target="_blank"><img :src="item.ali_image+'?x-oss-process=image/resize,w_80/quality,Q_100/format,webp'"></a>
-								</div>
+							<div class="cart-items">
 								<div class="name hide-row">
 									<div class="name-cell">
-										<a href="http://www.smartisan.com/shop/#/item/100027501" :title="item.title+'（'+item.spec_json.show_name+'）'" target="_blank">{{item.title}}（{{item.spec_json.show_name}}）</a>
+										<a href="" target="_blank">{{userOrder.itemName}}</a>
 									</div>
 								</div>
-								<div class="subtotal">
-									<div class="subtotal-cell"> ¥ {{item.price*item.count}}.00 </div>
-								</div>
-								<div class="goods-num">{{item.count}}</div>
-								<div class="price">¥ {{item.price}}.00</div>
+								<div class="goods-num">1</div>
+								<div class="price">¥ {{userOrder.totlePrice}}.00</div>
 							</div>
 						</div>
 					</div>
@@ -91,14 +51,14 @@
 				</div>
 				<div class="box-inner">
 					<div class="order-discount-line">
-						<p> 商品总计： <span>¥ {{checkedTotle}}.00</span> </p>
-						<p> 运费： <span>+ ¥ {{freight}}.00</span> </p>
+						<p> 商品总计： <span>¥ {{userOrder.totlePrice}}.00</span> </p>
+						<p> 运费： <span>+ ¥ {{userOrder.totlePostage}}.00</span> </p>
 						<!--<p class="discount-line js-discount-cash"> <em>现金券</em>： <span> - 0 </span> </p>-->
 					</div>
 				</div>
 				<div class="box-inner">
 					<div class="last-payment clear">
-						<span class="jianguo-blue-main-btn big-main-btn payment-blue-bt fn-right js-checkout" @click="submitOrderHandle"> <a>提交订单</a> </span> <span class="prices fn-right">应付金额： <em>¥ {{checkedTotle+freight}}.00</em></span>
+						<span class="jianguo-blue-main-btn big-main-btn payment-blue-bt fn-right js-checkout" @click="submitOrderHandle"> <a>确认支付</a> </span> <span class="prices fn-right">应付金额： <em>¥ {{totle}}.00</em></span>
 					</div>
 				</div>
 			</div>
@@ -109,99 +69,157 @@
 
 <script>
   import addressPop from '@/components/address-pop'
+  import { myPost, myGet } from '@/components/api'
 	export default {
-	  data () {
-	    return {
-	      receiveInfo: [],
-	      invoice: {
-	        personal: true,
-	        name: ''
-	      },
-	      popShow: false,
-	      oldReceive: null
-	    }
-	  },
-	  created () {
-	    this.$store.state.receiveInfo.forEach((receive,index) => {
-	      if(receive.default){
-	        receive.checked = true
-	        this.$store.state.receiveInfo.unshift(this.$store.state.receiveInfo.splice(index,1)[0])
-	      }else{
-	        receive.checked = false
-	      }
-	    })
-	    this.receiveInfo = this.$store.state.receiveInfo
-	  },
-	  computed: {
-	    carPanelData () {
-        return this.$store.state.provisionalOrder.items
-      },
-      checkedTotle () {
-        return this.$store.state.provisionalOrder.totlePrice
-      },
-      freight () {
-        let freight = 8
-        if(this.$store.state.provisionalOrder.totlePrice>88)
-        freight = 0
-        return freight
-      }
-	  },
-    components: {
-      addressPop
-    },
-    methods: {
-      selectedAddress (info) {
-        if(!info.checked){
-          this.receiveInfo.forEach((receive) => {
-            receive.checked = false
-          })
-          info.checked = true
+        data () {
+            return {
+                totle:0,
+                userOrder:"",
+                receiveInfo:[],
+                invoice: {
+                    personal: true,
+                    name: ''
+                },
+                popShow: false,
+                oldReceive: null
+            }
+        },
+        mounted () { //加载页面即执行
+            let data1 = new FormData();
+            let u = localStorage.getItem('userId');
+            data1.append('userId',u)
+            myPost('api/address',data1).then(res=>{
+                if(res.data.result != null){
+                    // console.log(res.data.result+",  " + typeof(res.data.result));
+                    this.$store.commit("setAddressInfo",res.data.result);
+                }
+                
+            })
+            this.getItemOrder();
+            this.getTotleFee();
+        },
+        created () {
+            
+            this.$store.state.addressInfo.forEach((receive,index) => {//检测地址选中状态
+                if(receive.defaultAddress == 1){
+                    receive.checked = 1
+                    this.$store.state.addressInfo.unshift(this.$store.state.addressInfo.splice(index,1)[0])
+                }else{
+                    receive.checked = 0
+                }
+            })
+            this.addressInfo = this.$store.state.addressInfo
+        },
+        computed: {
+            // checkedTotle () {
+            //     return this.$store.state.provisionalOrder.totlePrice
+            // },
+            // checkedPostage () {
+            //     return this.$store.state.provisionalOrder.totlePostage
+            // },
+        },
+        components: {
+            addressPop
+        },
+        methods: {
+            checkedTotle () {
+                return this.$store.state.provisionalOrder.totlePrice
+            },
+            checkedPostage () {
+                return this.$store.state.provisionalOrder.totlePostage
+            },
+            getItemOrder(){
+                // var userOrder = this.$route.query.userOrder; 
+                const userOrder = JSON.parse(sessionStorage.getItem("userOrder"))
+                this.userOrder = userOrder;
+            },
+            getTotleFee(){
+                const totle = this.userOrder.totlePrice+this.userOrder.totlePostage
+                this.totle = totle;
+                return totle
+            },
+            selectedAddress (info) {
+                if(info.checked==0){
+                    this.$store.getters.addressInfo.forEach((receive) => {
+                        let data1 = new FormData();
+                        data1.append('adrsid',receive.id);
+                        var c = parseInt(0);
+                        data1.append('checked',c);
+                        myPost('api/checkout/checked',data1).then(res=>{
+                            if(res.data.result!=null){
+                                console.log('此用户所有地址的选中标记消除')
+                                receive.checked = 0
+                            }
+                        })
+                    })                    
+                    let data1 = new FormData();
+                    data1.append('adrsid',info.id);
+                    var c = parseInt(1);
+                    data1.append('checked',c);
+                    myPost('api/checkout/checked',data1).then(res=>{
+                        console.log('设定当前选中标记')
+                        info.checked = 1
+                    })
+                }
+
+            },
+            getcheckedAddress(){
+                this.$store.getters.addressInfo.forEach((receive) => {
+                    if(receive.checked==1){
+                        this.receiveInfo = receive
+                    }
+                })
+            },
+            submitOrderHandle () {
+                let iDate = new Date();
+                let month = iDate.getMonth() + 1;
+                let strDate = iDate.getDate();
+                if (month >= 1 && month <= 9) {
+                    month = "0" + month;
+                }
+                if (strDate >= 0 && strDate <= 9) {
+                    strDate = "0" + strDate;
+                }
+                this.getcheckedAddress()//调用函数将选中的地址信息赋值到this.receiveInfo
+                let data = {
+                    orderId: iDate.getTime(),
+                    goodId: this.userOrder.itemId,
+                    price: this.userOrder.totlePrice,
+                    postage: this.userOrder.totlePostage,
+                    totleFee: this.getTotleFee(),
+                    goodName: this.userOrder.itemName,
+                    receiveInfo: this.receiveInfo,
+                    iDate: iDate.getFullYear() + '-' + month + '-' + strDate,
+                }
+                var ensure = confirm('确认付款？');
+                let data1 = new FormData();
+                let u = localStorage.getItem('userId');
+                data1.append('orderId',String(data.orderId));
+                data1.append('goodId',data.goodId);
+                data1.append('userId',u);
+                data1.append('addressId',data.receiveInfo.id);
+                console.log(typeof(data.orderId))
+                if(ensure==true){
+                    myPost('api/checkout/submit',data1).then(res=>{
+                        if(res.data.result==1){
+                            //数据库插入成功，再向下一页面跳转
+                            sessionStorage.setItem("submitOrder",JSON.stringify(data))
+                            this.$router.push({name: 'Payment', query: {orderId:data.orderId}})
+                        }
+                    })
+                    
+                }else{
+
+                }
+            },
+            addReceive () {
+                this.oldReceive = null
+                this.popShow = true
+            },
+            closePop () {
+                this.popShow = false
+            }
         }
-      },
-      checkedInvoice (boole) {
-        this.invoice.personal = boole
-      },
-      submitOrderHandle () {
-        if(!this.invoice.personal&&!this.invoice.name) return
-        let receiveInfo = this.receiveInfo.filter((item) => {
-          return item.checked
-        })[0]
-        let invoiceTitle = ""
-        if(this.invoice.personal){
-          invoiceTitle = "个人"
-        }else{
-          invoiceTitle = this.invoice.name
-        }
-        let iDate = new Date();
-        let month = iDate.getMonth() + 1;
-        let strDate = iDate.getDate();
-        if (month >= 1 && month <= 9) {
-            month = "0" + month;
-        }
-        if (strDate >= 0 && strDate <= 9) {
-            strDate = "0" + strDate;
-        }
-        let data = {
-          orderId: iDate.getTime(),
-          goodsData: this.carPanelData,
-          price: this.checkedTotle,
-          freight: this.freight,
-          invoiceTitle: invoiceTitle,
-          receiveInfo: receiveInfo,
-          iDate: iDate.getFullYear() + '-' + month + '-' + strDate,
-          isPay: false
-        }
-        this.$store.commit('submitOrder',data)
-        this.$router.push({name: 'Payment', query: {orderId:data.orderId}})
-      },
-      addReceive () {
-        this.oldReceive = null
-        this.popShow = true
-      },
-      closePop () {
-        this.popShow = false
-      }
-    }
 	}
 </script>
 
